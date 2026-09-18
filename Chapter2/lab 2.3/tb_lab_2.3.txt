@@ -1,0 +1,32 @@
+module tb_comparator;
+  reg [7:0] a;
+  reg [7:0] b;
+  wire g;
+  wire l;
+  wire e;
+ 
+    initial begin
+      $dumpfile("tb_comparator.vcd");
+      $dumpvars(0, tb_comparator);
+    end
+  comparator dut(a,b,g,l,e);
+  initial begin
+    // a<b 
+    a=8'b00110011;
+    b=8'b01010101;
+    #10;
+    // a=b
+    a=8'b00000000;
+    b=8'b00000000;
+    #10;
+    a=8'b10010010;
+    b=8'b01001001;
+    #10;
+    $finish;
+  end 
+endmodule 
+    
+    
+ 
+   
+  

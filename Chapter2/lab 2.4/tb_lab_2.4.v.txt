@@ -1,0 +1,60 @@
+`timescale 1ns/1ps
+
+module tb_counter_8_bit;
+
+    reg        clk;
+    reg [7:0]  d_in;
+    reg [1:0]  c;
+    wire [7:0] dout;
+  
+      initial begin
+      $dumpfile("tb_counter_8_bit.vcd");
+      $dumpvars(0, tb_counter_8_bit);
+    end
+
+    // Instantiate DUT
+    bit_counter uut (
+        .clk  (clk),
+        .d_in (d_in),
+        .c    (c),
+        .dout (dout)
+    );
+
+    // Clock generation: 10 ns period
+    always #5 clk = ~clk;
+
+    initial begin
+        // Initialize signals
+        clk  = 0;
+        d_in = 8'd0;
+        c    = 2'b11;     
+
+       
+        #10;
+
+        // Load 50
+        d_in = 8'd50;
+        c = 2'b00;
+        #10;
+
+        // Increment
+        c = 2'b01;
+        #10;
+        #10;
+        #10;
+
+        // Decrement
+        c = 2'b10;
+        #10;
+        #10;
+
+        // Reset
+        c = 2'b11;
+        #10;
+
+        // Finish simulation
+        $finish;
+    end
+
+
+endmodule
