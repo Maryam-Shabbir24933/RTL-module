@@ -1,0 +1,32 @@
+// Code your design here
+module serial(bit_out, byte_in, clk, reset);
+
+    input clk;
+    input reset;
+    input [7:0] byte_in;
+    output reg bit_out;
+
+    reg [7:0] shift_reg;
+    reg [2:0] count;
+
+    always @(posedge clk or negedge reset) begin
+        if (!reset) begin
+            shift_reg <= 8'b0;
+            count <= 3'b0;
+            bit_out <= 1'b0;
+        end
+        else begin
+            bit_out <= shift_reg[7];
+            shift_reg <= {shift_reg[6:0], 1'b0};
+
+            if (count == 3'd7) begin
+                shift_reg <= byte_in;
+                count <= 3'b0;
+            end
+            else begin
+                count <= count + 1'b1;
+            end
+        end
+    end
+
+endmodule

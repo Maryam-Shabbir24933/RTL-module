@@ -1,0 +1,83 @@
+`timescale 1ns/1ps
+module tb_regfile;
+    reg  [7:0] d_in;
+    reg  [3:0] addr_in;
+    reg        r_w, clk;
+    wire [7:0] d_out;
+
+    regfile dut (.d_out(d_out), .d_in(d_in), .addr_in(addr_in), .r_w(r_w), .clk(clk));
+
+    initial clk = 1'b0;
+    always #5 clk = ~clk;
+
+    reg [7:0] model [0:15];
+    reg [7:0] last_out;
+    integer errors, k, seed;
+
+    task write_reg(input [3:0] a, input [7:0] d);
+        begin
+            addr_in = a; d_in = d; r_w = 1'b1;
+            @(posedge clk); #1;
+            model[a] = d;
+        end
+    endtask
+
+    task read_reg(input [3:0] a);
+        begin
+            addr_in = a; r_w = 1'b0;
+            @(posedge clk); #1;
+            if (d_out !== model[a]) begin
+                $display("ERROR: read addr %0d  got 0x%02h  expected 0x%02h", a, d_out, model[a]);
+                errors = errors + 1;
+            end
+        end
+    endtask
+
+    initial begin
+        $dumpfile("regfile.vcd");
+        $dumpvars(0, tb_regfile);
+        errors = 0; seed = 7;
+        d_in = 8'h00; addr_in = 4'h0; r_w = 1'b0;
+        @(negedge clk);
+
+        // write all 16, back-to-back
+        for (k = 0; k < 16; k = k + 1) write_reg(k[3:0], 8'h10 + 8'd17 * k[7:0]);
+
+        // read all 16, back-to-back, forward then reverse
+        for (k = 0; k < 16; k = k + 1) read_reg(k[3:0]);
+        for (k = 15; k >= 0; k = k - 1) read_reg(k[3:0]);
+
+        // random reads and writes
+        last_out = d_out;
+        for (k = 0; k < 500; k = k + 1) begin
+            if ($random(seed) & 1) begin
+                write_reg($random(seed), $random(seed));
+                if (d_out !== last_out) begin
+                    $display("ERROR: d_out changed during write (0x%02h -> 0x%02h)", last_out, d_out);
+                    errors = errors + 1;
+                end
+            end else begin
+                read_reg($random(seed));
+                last_out = d_out;
+            end
+        end
+
+        // neighbours must be undisturbed
+        write_reg(4'h5, 8'hAA);
+        write_reg(4'hA, 8'h55);
+        read_reg(4'h5);
+        read_reg(4'hA);
+        read_reg(4'h4);
+        read_reg(4'h6);
+
+        if (errors == 0) $display("*** TEST PASSED ***");
+        else             $display("*** TEST FAILED: %0d error(s) ***", errors);
+        $finish;
+    end
+
+    initial begin
+        #100000;
+        $display("*** TIMEOUT ***");
+        $finish;
+    end
+endmodule

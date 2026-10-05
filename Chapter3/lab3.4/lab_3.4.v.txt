@@ -1,0 +1,29 @@
+module ones_count(CLK, RST, VAL, Num, Pos);
+  input wire CLK;
+  input wire RST;
+  input wire [7:0]VAL;
+  output reg [2:0]Num;
+  output reg [2:0]Pos;
+
+  integer i;
+  integer count;
+
+  always @(posedge CLK or negedge RST) begin
+    if (!RST) begin
+      Num<= 3'b000;
+      Pos<= 3'b000;
+    end
+    else begin
+      count = 0;
+      Pos   <= 3'b000;
+    for (i=7; i >=0; i=i-1) begin
+        if (VAL[i] == 1'b1) begin
+          count = count + 1;
+            Pos<= i;
+        end
+     end
+      Num <= count;
+    end
+  end
+
+endmodule

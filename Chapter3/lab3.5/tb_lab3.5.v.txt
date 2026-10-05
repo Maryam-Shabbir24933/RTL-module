@@ -1,0 +1,56 @@
+`timescale 1ns/1ps
+
+module tb_parity_gen;
+
+  reg CLK;
+  reg [31:0] DIN;
+  wire [35:0] DOUT;
+
+  // DUT
+  parity_gen uut (
+    .CLK(CLK),
+    .DIN(DIN),
+    .DOUT(DOUT)
+  );
+
+  // Clock
+  always #5 CLK = ~CLK;
+
+  initial begin
+
+    // Waveform
+    $dumpfile("parity_gen.vcd");
+    $dumpvars(0, tb_parity_gen);
+
+    CLK = 0;
+
+    // Test 1
+    DIN = 32'd0;
+    #10;
+    $display("DIN=%d  DOUT=%b", DIN, DOUT);
+
+    // Test 2
+    DIN = 32'd1;
+    #10;
+    $display("DIN=%d  DOUT=%b", DIN, DOUT);
+
+    // Test 3
+    DIN = 32'd2;
+    #10;
+    $display("DIN=%d  DOUT=%b", DIN, DOUT);
+
+    // Test 4
+    DIN = 32'd3;
+    #10;
+    $display("DIN=%d  DOUT=%b", DIN, DOUT);
+
+    // Test 5
+    DIN = 32'd7;
+    #10;
+    $display("DIN=%d  DOUT=%b", DIN, DOUT);
+
+    $finish;
+
+  end
+
+endmodule

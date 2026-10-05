@@ -1,0 +1,59 @@
+`timescale 1ns/1ps
+
+module tb_serial;
+
+reg clk;
+reg reset;
+reg [7:0] byte_in;
+wire bit_out;
+
+// DUT
+serial uut (
+    .bit_out(bit_out),
+    .byte_in(byte_in),
+    .clk(clk),
+    .reset(reset)
+);
+
+// Clock generation
+always #5 clk = ~clk;
+
+initial begin
+
+    // Initialize signals
+    clk     = 1'b0;
+    reset   = 1'b0;
+    byte_in = 8'b0;
+
+    // Apply reset
+    #10;
+    reset = 1'b1;
+
+    // Give first byte
+    byte_in = 8'b10110011;
+
+    // Wait
+    #100;
+
+    // Give second byte
+    byte_in = 8'b11001010;
+
+    // Wait
+    #100;
+
+    // Give third byte
+    byte_in = 8'b11110000;
+
+    // Wait
+    #100;
+
+    $finish;
+end
+
+// Monitor output
+always @(posedge clk) begin
+    $display("Time=%0t | Reset=%b | Byte_In=%b | Shift_Reg=%b | Count=%d | Bit_Out=%b",
+             $time, reset, byte_in, uut.shift_reg, uut.count, bit_out);
+end
+
+endmodule

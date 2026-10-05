@@ -1,0 +1,13 @@
+module mux8x1(a0, a1, a2, a3, a4, a5, a6, a7, sel, dout);
+  input wire[4:0] a0, a1, a2, a3, a4, a5, a6, a7;
+  input wire[2:0] sel;
+  output reg[4:0] dout;
+    
+    assign dout = (sel == 3'b000) ? a0:
+                  (sel == 3'b001) ? a1:
+                  (sel == 3'b010) ? a2:
+                  (sel == 3'b011) ? a3:
+                  (sel == 3'b100) ? a4:
+                  (sel == 3'b101) ? a5:
+                  (sel == 3'b110) ? a6: a7;
+  endmodule

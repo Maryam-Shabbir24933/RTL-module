@@ -1,0 +1,11 @@
+module sync_sc_ff(out, set, clear,clk);
+  input wire clk, set, clear;
+  output reg [3:0] out;
+  
+  always @(posedge clk) begin
+    if(clear)
+      out <= 4'b0000;
+      else if(set)
+        out <= 4'b1111;
+  end
+endmodule

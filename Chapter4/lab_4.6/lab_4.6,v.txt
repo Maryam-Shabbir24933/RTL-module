@@ -1,0 +1,30 @@
+ 
+module seq_detect (in_wire, out, clk, reset);
+    input  in_wire, clk, reset;
+    output out;
+
+    localparam IDLE = 0, S0 = 1, S01 = 2, S011 = 3, S010 = 4, DET = 5;
+
+    reg [2:0] state, next_state;
+
+    assign out = (state == DET);
+
+    always @(posedge clk) begin
+        if (reset)
+            state <= IDLE;
+        else
+            state <= next_state;
+    end
+
+    always @(*) begin
+        case (state)
+            IDLE:next_state = in_wire ? IDLE : S0;
+            S0: next_state = in_wire ? S01  : S0;
+            S01: next_state = in_wire ? S011 : S010;
+            S011: next_state = in_wire ? IDLE : DET;
+            S010: next_state = in_wire ? DET  : S0;
+            DET: next_state = in_wire ? IDLE : S0;
+            default: next_state = IDLE;
+        endcase
+    end
+endmodule

@@ -1,0 +1,72 @@
+`timescale 1ns/1ps
+
+module tb_seq_detect;
+
+    reg in_wire;
+    reg clk;
+    reg reset;
+    wire out;
+
+    seq_detect dut (
+        .in_wire(in_wire),
+        .out(out),
+        .clk(clk),
+        .reset(reset)
+    );
+
+    // Clock
+    always #5 clk = ~clk;
+
+    // VCD waveform dump
+    initial begin
+        $dumpfile("seq_detect.vcd");
+        $dumpvars(0, tb_seq_detect);
+    end
+
+    task send_bit;
+        input bit_value;
+        begin
+            in_wire = bit_value;
+            #10;
+        end
+    endtask
+
+    initial begin
+
+        clk = 0;
+        reset = 1;
+        in_wire = 0;
+
+        // Reset
+        #10;
+        reset = 0;
+
+        // Detect 0110
+        $display("Sending 0110");
+
+        send_bit(0);
+        send_bit(1);
+        send_bit(1);
+        send_bit(0);
+
+        #10;
+
+        // Reset
+        reset = 1;
+        #10;
+        reset = 0;
+
+        // Detect 0101
+        $display("Sending 0101");
+
+        send_bit(0);
+        send_bit(1);
+        send_bit(0);
+        send_bit(1);
+
+        #10;
+
+        $finish;
+    end
+
+endmodule

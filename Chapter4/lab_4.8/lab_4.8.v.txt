@@ -1,0 +1,48 @@
+
+module ram (d_out, d_in, wr_addr, rd_addr, we, re, clk);
+    output reg [7:0] d_out;
+    input      [7:0] d_in;
+    input      [6:0] wr_addr, rd_addr;
+    input            we, re, clk;
+
+    reg [7:0] mem [0:127];
+
+    always @(posedge clk) begin
+        if (we) mem[wr_addr] <= d_in;
+        if (re) d_out        <= mem[rd_addr];
+    end
+endmodule
+
+module fifo (d_in, d_in_valid, d_out, d_out_req, clk, full, empty);
+    input wire[7:0] d_in;
+    output wire[7:0] d_out;
+    input wire d_in_valid, d_out_req, clk;
+    output full, empty;
+//write and read pointers 
+    reg [6:0] wr_ptr = 7'd0;
+    reg [6:0] rd_ptr = 7'd0;
+  //count to account for full and empty 
+    reg [7:0] count  = 8'd0;
+    assign full  = (count == 8'd128);
+    assign empty = (count == 8'd0);
+
+    wire wr;
+  assign wr = d_in_valid && !full;// cater write after full 
+    wire rd;
+  assign rd = d_out_req  && !empty;// cater read afer empty 
+//ram instantiation
+    ram u_ram (.d_out(d_out), .d_in(d_in), .wr_addr(wr_ptr), .rd_addr(rd_ptr),
+               .we(wr), .re(rd), .clk(clk));
+
+    always @(posedge clk) begin
+      if (wr) 
+        wr_ptr <= wr_ptr + 1'b1;
+      if (rd) 
+        rd_ptr <= rd_ptr + 1'b1;
+
+      if (wr && !rd)      
+        
+        count <= count + 1'b1;
+      else if (rd && !wr) count <= count - 1'b1;
+    end
+endmodule

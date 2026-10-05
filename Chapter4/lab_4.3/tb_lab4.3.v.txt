@@ -1,0 +1,72 @@
+`timescale 1ns/1ps
+
+module tb_majority_voter;
+
+  reg clk;
+  reg in;
+  wire out;
+
+  majority_voter uut (
+    .clk(clk),
+    .in(in),
+    .out(out)
+  );
+
+  // Clock
+  always #5 clk = ~clk;
+
+  initial begin
+
+    $dumpfile("majority_voter.vcd");
+    $dumpvars(0, tb_majority_voter);
+
+    clk = 0;
+    in = 0;
+
+    // First sample = 1
+    #10;
+    in = 1;
+
+    // Second sample = 1
+    #10;
+    in = 1;
+
+    // Third sample = 0
+    #10;
+    in = 0;
+
+    // Majority = 1
+    #10;
+    $display("Samples = 1 1 0 | out = %b", out);
+
+    // Next samples: 0 0 1
+    in = 0;
+    #10;
+
+    in = 0;
+    #10;
+
+    in = 1;
+    #10;
+
+    // Majority = 0
+    #10;
+    $display("Samples = 0 0 1 | out = %b", out);
+
+    // Samples: 1 1 1
+    in = 1;
+    #10;
+
+    in = 1;
+    #10;
+
+    in = 1;
+    #10;
+
+    $display("Samples = 1 1 1 | out = %b", out);
+
+    $finish;
+
+  end
+
+endmodule

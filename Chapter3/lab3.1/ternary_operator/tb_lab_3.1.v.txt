@@ -1,0 +1,95 @@
+
+
+module tb_mux8x1;
+
+  reg [4:0] a0, a1, a2, a3, a4, a5, a6, a7;
+  reg [2:0] sel;
+  wire [4:0] dout;
+
+  // DUT
+  mux8x1 uut (
+    .sel(sel),
+    .a0(a0),
+    .a1(a1),
+    .a2(a2),
+    .a3(a3),
+    .a4(a4),
+    .a5(a5),
+    .a6(a6),
+    .a7(a7),
+    .dout(dout)
+  );
+
+  initial begin
+
+    // Waveform dump
+    $dumpfile("mux8x1.vcd");
+    $dumpvars(0, tb_mux8x1);
+
+    // Give different values to all inputs
+    a0 = 5'b00001;
+    a1 = 5'b00010;
+    a2 = 5'b00011;
+    a3 = 5'b00100;
+    a4 = 5'b00101;
+    a5 = 5'b00110;
+    a6 = 5'b00111;
+    a7 = 5'b01000;
+
+    // Test a0
+    sel = 3'b000;
+    #10;
+    $display("sel=%b, dout=%b", sel, dout);
+
+    // Test a1
+    sel = 3'b001;
+    #10;
+    $display("sel=%b, dout=%b", sel, dout);
+
+    // Test a2
+    sel = 3'b010;
+    #10;
+    $display("sel=%b, dout=%b", sel, dout);
+
+    // Test a3
+    sel = 3'b011;
+    #10;
+    $display("sel=%b, dout=%b", sel, dout);
+
+    // Test a4
+    sel = 3'b100;
+    #10;
+    $display("sel=%b, dout=%b", sel, dout);
+
+    // Test a5
+    sel = 3'b101;
+    #10;
+    $display("sel=%b, dout=%b", sel, dout);
+
+    // Test a6
+    sel = 3'b110;
+    #10;
+    $display("sel=%b, dout=%b", sel, dout);
+
+    // Test a7
+    sel = 3'b111;
+    #10;
+    $display("sel=%b, dout=%b", sel, dout);
+
+    $finish;
+  end
+
+endmodule
+
+
+
+  
+  
+  
+  
+
+    
+    
+ 
+   
+  

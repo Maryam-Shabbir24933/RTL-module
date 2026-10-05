@@ -1,0 +1,27 @@
+
+module dff8 (q, d, clk);
+    output reg [7:0] q;
+    input      [7:0] d;
+    input            clk;
+
+    always @(posedge clk)
+        q <= d;
+endmodule
+
+module regfile (d_out, d_in, addr_in, r_w, clk);
+    output [7:0] d_out;
+    input  [7:0] d_in;
+    input  [3:0] addr_in;
+    input        r_w, clk;        
+
+    wire [7:0] q [0:15];
+
+    genvar i;
+    generate
+        for (i = 0; i < 16; i = i + 1) begin : g_reg
+            dff8 u_reg (.q(q[i]), .d((r_w && addr_in == i) ? d_in : q[i]), .clk(clk));
+        end
+    endgenerate
+
+    dff8 u_out (.q(d_out), .d(r_w ? d_out : q[addr_in]), .clk(clk));
+endmodule
